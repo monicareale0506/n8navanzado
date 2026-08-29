@@ -1,0 +1,834 @@
+{
+  "name": "Chekpoint4_Monica_Reale",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5def104d-5028-44d9-b644-547f66cb1d3e",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xJUeZtOYfFKIdvTb",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7f10d750-b010-4e9e-ac45-39c5ee1373b6",
+              "leftValue": "={{ $json.Subject }}",
+              "rightValue": "Alerta de Seguridad",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "26997d20-176a-4274-98d3-900394e9537b",
+              "leftValue": "={{ $json.From }}",
+              "rightValue": "no-reply@",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "69af5d22-706d-4eac-bdcd-20d79eb1a7ee",
+              "leftValue": "={{ $json.From }}",
+              "rightValue": "noreply@",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c7ae366e-7c3f-4de0-941e-e00b0ace05c8",
+              "leftValue": "={{ $json.From }}",
+              "rightValue": "Google <no-reply@accounts.google.com>",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c506ea9d-cf9c-4df3-9668-72101caa5a07",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c9f22641-5511-4676-800f-69c85287c01b",
+              "leftValue": "={{ $json.Subject }}",
+              "rightValue": "venta",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        96
+      ],
+      "id": "209104bf-29cf-4948-a404-181ca4022453",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7e777538-f27f-4c65-a219-d20374ce3659",
+              "name": "snippet",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            },
+            {
+              "id": "a90fbcd1-0973-42c4-b20f-8778cd4bf110",
+              "name": "From",
+              "value": "={{ $json.From }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        80
+      ],
+      "id": "088f6ed8-a4aa-452b-9edf-77750cdfb1a9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.snippet }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"nombre\": {\n      \"type\": \"string\",\n      \"description\": \"El nombre y apellido completo de la persona\"\n    },\n    \"correo\": {\n      \"type\": \"string\",\n      \"description\": \"La dirección de correo electrónico\"\n    },\n    \"compra\": {\n      \"type\": \"string\",\n      \"description\": \"El artículo o dispositivo que fue adquirido\"\n    },\n    \"pago\": {\n      \"type\": \"number\",\n      \"description\": \"El monto total abonado por la compra. Extraer solo el número\"\n    },\n    \"consulta\": {\n      \"type\": \"string\",\n      \"description\": \"El motivo, queja, reclamo o duda expresada por el usuario\"\n    }\n  },\n  \"required\": [\"nombre\", \"correo\", \"compra\", \"pago\", \"consulta\"]\n}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        32
+      ],
+      "id": "7dc73fe7-1068-4625-ba32-d46f324ea224",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": "groq/compound-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        880,
+        160
+      ],
+      "id": "83ce54da-aa48-4ecc-b503-c841387bb24f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "dkxSRPg3f79QrWHc",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appsKi5VZzZ1xUd0g",
+          "mode": "list",
+          "cachedResultName": "Clientes",
+          "cachedResultUrl": "https://airtable.com/appsKi5VZzZ1xUd0g"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblm77nwEvhIEQQea",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appsKi5VZzZ1xUd0g/tblm77nwEvhIEQQea"
+        },
+        "filterByFormula": "={correo}=\"{{ $json.output.correo }}\"\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1152,
+        128
+      ],
+      "id": "cdfb36ca-c28f-428d-8bba-6fb981591117",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "nlCJPemiBHZj1TTm",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "fields.Correo"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        1392,
+        128
+      ],
+      "id": "c7435850-9ed1-44b6-9a91-f486efb157ec",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a720ad4f-5bff-43f2-b598-459e3b9052a1",
+              "leftValue": "={{ $json.count_fields_Correo }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1648,
+        128
+      ],
+      "id": "fc5118a2-56ab-438c-a175-a5d007442e10",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cd81da19-b5f0-4cda-94d3-b571566bd55d",
+              "name": "fields.Correo",
+              "value": "={{ $('Search records').item.json.fields.Correo }}",
+              "type": "string"
+            },
+            {
+              "id": "aa225202-8f48-44e8-ac41-f0cc4bed8d64",
+              "name": "fields.Nombre",
+              "value": "={{ $('Search records').item.json.fields.Nombre }}",
+              "type": "string"
+            },
+            {
+              "id": "b20f303b-1951-4176-89b6-fa57e5897296",
+              "name": "fields.Compra",
+              "value": "={{ $('Search records').item.json.fields.Compra }}",
+              "type": "string"
+            },
+            {
+              "id": "f8ae1d80-15a4-43b4-b715-d54bd5766edc",
+              "name": "fields.Pago",
+              "value": "={{ $('Search records').item.json.fields.Pago }}",
+              "type": "number"
+            },
+            {
+              "id": "fb033393-69ad-4bea-a402-d4ef2d83f4bb",
+              "name": "fields.Consulta",
+              "value": "={{ $('Information Extractor').item.json.output.consulta }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1872,
+        64
+      ],
+      "id": "013d1975-ddb5-4d70-a667-61e698efd75e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=El cliente {{ $json.fields.Nombre }} con el mail: {{ $json.fields.Correo }} dice acerca de su compra:{{ $json.fields.Consulta }} el pago fue de {{ $json.fields.Pago }}",
+        "options": {
+          "systemMessage": "# Rol\n\nSos un agente autónomo de ventas y soporte. Recibís información proveniente de correos electrónicos y debés analizar el campo `consultas` para determinar qué acción corresponde.\n\n## Datos disponibles\n\nEl input puede contener:\n\n* `nombre`: nombre del cliente.\n* `compra`: producto o servicio adquirido.\n* `precio`: precio de la compra.\n* `consultas`: consulta, solicitud o problema informado por el cliente.\n* `email`: dirección de correo del cliente.\n\n## Reglas de decisión\n\n### 1. Consulta o problema general\n\nSi el campo `consultas` contiene una pregunta, pedido de información, reclamo o problema que **NO implique solicitar una devolución de dinero**, debés:\n\n1. Analizar la consulta.\n2. Generar una respuesta clara y profesional.\n3. Utilizar la herramienta **Gmail Draft** para crear un borrador de respuesta.\n4. No enviar el correo directamente.\n5. El borrador debe dirigirse al cliente indicado en `email`.\n6. Utilizar únicamente información disponible en los datos recibidos. No inventar precios, políticas, pedidos ni información del cliente.\n\n### 2. Solicitud de devolución de dinero\n\nSi el campo `consultas` indica que el cliente solicita una devolución, reembolso, reintegro o devolución del dinero:\n\n1. Identificar que se trata de una solicitud de devolución.\n2. Utilizar la herramienta de **Gmail Human-in-the-Loop** para preparar la respuesta al cliente.\n3. La acción debe quedar pendiente de aprobación humana antes de enviarse.\n4. Una vez realizada/aprobada la acción correspondiente, registrar la solicitud en **Table Store**.\n5. En Table Store guardar como mínimo:\n\n   * `nombre`\n   * `email`\n   * `precio`\n   * `consultas`\n que corresponda según el resultado de la aprobación.\n\n## Regla de seguridad\n\nNunca envíes un correo de devolución directamente sin utilizar el mecanismo de Human-in-the-Loop.\n\nSi falta información necesaria, no inventes datos. Utilizá únicamente la información disponible y, cuando sea necesario, solicitá la información faltante.\n\n## Prioridad\n\nSi una consulta contiene simultáneamente una pregunta y una solicitud de devolución, clasificá el caso como **devolución**.\n\nTu objetivo es decidir autónomamente qué herramienta utilizar según el contenido de `consultas`, respetando siempre las reglas anteriores.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2080,
+        -64
+      ],
+      "id": "f76b67f5-6740-4397-917a-55affb131178",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        2080,
+        352
+      ],
+      "id": "a0470dd7-b0a9-4c6d-a0dd-3d891da4b0ae",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "mWleR7YW9CYdpjwS",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "respuesta",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        2288,
+        224
+      ],
+      "id": "193526ce-4016-4f81-bacb-28a2e9b652c6",
+      "name": "Create a draft in Gmail",
+      "webhookId": "f6e2b6b4-5a15-49bb-9f69-ece0cdcfca73",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xJUeZtOYfFKIdvTb",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "=tienes un aprobación pendiente...",
+        "sendTo": "05moni06@gmail.com",
+        "subject": "Se requiere aprobación",
+        "approvalOptions": {
+          "values": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailHitlTool",
+      "typeVersion": 2.2,
+      "position": [
+        2384,
+        96
+      ],
+      "id": "903ac7bd-3f8c-4410-9f22-7e1899201f6b",
+      "name": "Gmail",
+      "webhookId": "f0da31ff-dbae-4acb-aaaf-cf1edf01d5ed",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xJUeZtOYfFKIdvTb",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "SNTlhW22cTAEcd1V",
+          "mode": "list",
+          "cachedResultName": "tablainterna",
+          "cachedResultUrl": "/projects/GDz1LLJUNzW1R9xC/datatables/SNTlhW22cTAEcd1V"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado": false,
+            "pago": "={{ $json.fields.Pago }}",
+            "correo": "={{ $json.fields.Correo }}",
+            "nombre": "={{ $json.fields.Nombre }}",
+            "consulta": "={{ $json.fields.Consulta }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "correo",
+              "displayName": "correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "dni",
+              "displayName": "dni",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "pago",
+              "displayName": "pago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "consulta",
+              "displayName": "consulta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        2448,
+        288
+      ],
+      "id": "96d7f949-e48b-431a-a547-3fca1f26a4b7",
+      "name": "Insert row in Data table"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.fields.Correo }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        2176,
+        272
+      ],
+      "id": "2d5399b0-cdd3-4a49-b2d8-ba9a05a7e9b8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "## Recepción de mails en general\n",
+        "height": 320,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -96,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "dfc90dc0-e914-4396-84dc-d9615a93099b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Filtros para evitar spams y seleccionar los de ventas\n\n",
+        "height": 320,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "f937ae43-02b8-4c9e-adc0-02f6829681f5",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Edición de campos para envair al extractor\n",
+        "height": 320,
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        608,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "4b031e31-41a0-41ea-b17c-facfd055153d",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Extractor de datos del mensaje en formato json\n",
+        "height": 384,
+        "width": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        816,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "d48db02d-1747-44e3-bfb6-9407eba66ad6",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Búsqueda del registro en la tabla de airtable\n",
+        "height": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1104,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "8913548a-1a99-4894-afe6-3e2f236067aa",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Sumarize para determinar si el correo existe en la base de datos de Airtable\n",
+        "height": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1360,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "1d2a9b38-1ac1-413c-a1d4-110432e5c733",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "##  If para  corroborar que el correo exista en al base de datos\n\n",
+        "height": 368,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1600,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "82ea3a18-488f-4dfd-861d-601ab1c9de97",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Edición de campos\n para enviar al agente\n",
+        "height": 368,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1824,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "0b3dfaf5-8e65-4ad0-b377-bd150790b7bf",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Agente de ia que analiza las consultas con cerebro, memoria simple,  genera un borrador para responder al cliente y si lo considera necesario envia un mensaje para la supervisión huimana y espera la decisión; Luego graba la consulta en una tabla interna ",
+        "height": 800,
+        "width": 624
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2048,
+        -272
+      ],
+      "typeVersion": 1,
+      "id": "cbd40889-8ff0-40e4-841d-e80bc61be8b7",
+      "name": "Sticky Note8"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row in Data table": {
+      "ai_tool": [
+        [
+          {
+            "node": "Gmail",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "96ad3db4-32c9-4b30-82a1-cc1daa73ae1f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e6061240e809e1be553f77c8b4b5dae0a5c6379d1e6173d377fb0d2ad5154b34"
+  },
+  "nodeGroups": [],
+  "id": "ow98v51jWpIgek1S",
+  "tags": []
+}
